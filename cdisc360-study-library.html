@@ -27,24 +27,24 @@
 
         </slide>
         <slide class="row-fluid">
-                <div class="col-sm-7">
+                <div class="col-sm-9">
                         <figure>
                             <pre class="pre-scrollable code runnable">
-                                CALL apoc.load.jsonParams("https://library.cdisc.org/api/mdr/sdtmig/3-2/datasets",
-                                {Authorization: "Basic "+$C360auth, Accept: "application/json"}, null) yield value as link1
-                                UNWIND link1._links.datasets as dataset_list
-                                WITH dataset_list 
-                                // WHERE substring(dataset_list.href, 25) = 'DM'
-                                CALL apoc.load.jsonParams("https://library.cdisc.org/api" + dataset_list.href,
-                                {Authorization: "Basic "+$C360auth, Accept: "application/json"}, null) yield value as link2
-                                WITH dataset_list, link2
-                                CREATE (d:SDTMDataset {name: link2.name, label: link2.label, description: link2.description, structure: link2.datasetStructure, ordinal: link2.ordinal})
-                                WITH dataset_list, link2, d
-                                UNWIND link2.datasetVariables as dv
-                                WITH dataset_list, link2, dv, d
-                                CREATE (v:SDTMVariable {name: dv.name, label: dv.label, description: dv.description , role: dv.role , core: dv.core , data_type: dv.simpleDatatype})
-                                WITH d, v
-                                CREATE (d)-[:CONTAINS]->(v);</pre>
+CALL apoc.load.jsonParams("https://library.cdisc.org/api/mdr/sdtmig/3-2/datasets",
+{Authorization: "Basic "+$C360auth, Accept: "application/json"}, null) yield value as link1
+UNWIND link1._links.datasets as dataset_list
+WITH dataset_list 
+// WHERE substring(dataset_list.href, 25) = 'DM'
+CALL apoc.load.jsonParams("https://library.cdisc.org/api" + dataset_list.href,
+{Authorization: "Basic "+<b>$C360auth</b>, Accept: "application/json"}, null) yield value as link2
+WITH dataset_list, link2
+CREATE (d:SDTMDataset {name: link2.name, label: link2.label, description: link2.description, structure: link2.datasetStructure, ordinal: link2.ordinal})
+WITH dataset_list, link2, d
+UNWIND link2.datasetVariables as dv
+WITH dataset_list, link2, dv, d
+CREATE (v:SDTMVariable {name: dv.name, label: dv.label, description: dv.description , role: dv.role , core: dv.core , data_type: dv.simpleDatatype})
+WITH d, v
+CREATE (d)-[:CONTAINS]->(v);</pre>
                             <figcaption>Find the produce category.</figcaption>
                         </figure>
                     </div>
