@@ -32,9 +32,9 @@
                 <div class="col-sm-12">
                     <h4>Querying the CDISC Library</h4>
                 <p>In the following code, we make two <abbr title="Application Programming Interface">API</abbr> requests to the CDISC Library. First we query for datasets in SDTMIG Version 3.2. The response by CDISC Library is delivered in a .JSON format that Cypher can interpret and use in query number two. We use the response to query the CDISC library for the variables defined in the datasets that the first query returned.</p>
-                <p>The first query can be identified by the code: 
-                    <code>CALL apoc.load.jsonParams(&#34;https://library.cdisc.org/api/mdr/sdtmig/3-2/datasets&#34;,{Authorization: &#34;Basic &#34;+$C360auth, Accept: "application/json"}, null)</code>
-                    Notice the use of the parameter, <code>&#36;C360auth</code>, which we previously defined.</p>
+                <p>The first query can be identified by the code: </p>
+                    <code>CALL apoc.load.jsonParams(&#34;<strong>https://library.cdisc.org/api/mdr/sdtmig/3-2/datasets</strong>&#34;,{Authorization: &#34;Basic &#34;+$C360auth, Accept: "application/json"}, null)</code>
+                <p>Notice the use of the parameter, <code>&#36;C360auth</code>, which we previously defined.</p>
                         <figure>
                             <pre class="pre-scrollable code runnable">
 CALL apoc.load.jsonParams("https://library.cdisc.org/api/mdr/sdtmig/3-2/datasets",
