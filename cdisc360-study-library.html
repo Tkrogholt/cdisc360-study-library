@@ -22,19 +22,19 @@
 :params {C360auth: 'INSERT API KEY HERE - KEEP THE SINGLE QUOTES'}
                     </pre>
                 </figure>
-                <p>This statement will create the parameter named C360auth containing the information encompassed by the single quotes. A parameter can be compared to a SAS macro variable or in many other languages, simply a variable. A parameter is referenced by $name (in this case, $C360auth) and the remaining code statements can now be executed as-is, due to parameter usage.</p>
+                <p>This statement will create the parameter named <span class="text-danger">C360auth</span> containing the information encompassed by the single quotes. A parameter can be compared to a SAS macro variable or in many other languages, simply a variable. A parameter is referenced by $name (in this case, $C360auth) and the remaining code statements can now be executed as-is, due to parameter usage.</p>
+                <p class="text-center"><strong>This guide is still work-in-progress. Suggestions and feedback is very much appreciated and can be sent to <a href="mailto:#">tkqt@novonordisk.com</a></strong></p>
             </div>
 
         </slide>
         <slide class="row-fluid">
-                <div class="col-sm-10">
+                <div class="col-sm-12">
                         <figure>
                             <pre class="pre-scrollable code runnable">
 CALL apoc.load.jsonParams("https://library.cdisc.org/api/mdr/sdtmig/3-2/datasets",
 {Authorization: "Basic "+<span class="text-danger"><b>$C360auth</b></span>, Accept: "application/json"}, null) yield value as link1
 UNWIND link1._links.datasets as dataset_list
 WITH dataset_list 
-// WHERE substring(dataset_list.href, 25) = 'DM'
 CALL apoc.load.jsonParams("https://library.cdisc.org/api" + dataset_list.href,
 {Authorization: "Basic "+<b class="text-danger">$C360auth</b>, Accept: "application/json"}, null) yield value as link2
 WITH dataset_list, link2
