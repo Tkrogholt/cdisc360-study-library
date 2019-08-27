@@ -29,6 +29,35 @@
 
         </slide>
         <slide class="row-fluid">
+            <div class="col-sm-12">
+                <h4>Querying the CDISC Library</h4>
+                <p>Now that we have defined <code>&#36;C360auth</code>, we can start making queries to the CDISC library.</p>
+                <figure>
+                    <pre class="pre-scrollable code runnable">
+    CALL apoc.load.jsonParams("https://library.cdisc.org/api/mdr/sdtmig/3-2/datasets",
+    {Authorization: "Basic "+$C360auth, Accept: "application/json"}, null) yield value as link1
+                    </pre>
+                </figure>
+                <p>The query above doesn't return a cypher node, but instead merely outputs the JSON format that is returned by CDISC Library</p>
+                <p>JSON files can be thought of as a nested tree of attributes. The code above queried the CDISC Library for datasets in SDTM under IG Version 3.2</p>
+                <code>
+                        {
+                            "registrationStatus": "Final",
+                            "_links": {
+                              "self": {
+                                "title": "Study Data Tabulation Model Implementation Guide: Human Clinical Trials Version 3.2 (Final)",
+                                "type": "SDTMIG Dataset List",
+                                "href": "/mdr/sdtmig/3-2/datasets"
+                              },
+                              "priorVersion": {
+                                "title": "Study Data Tabulation Model Implementation Guide: Human Clinical Trials Version 3.1.3 (Final)",
+                </code>
+            </div>
+        </slide>
+
+        CALL apoc.load.jsonParams("https://library.cdisc.org/api/mdr/sdtmig/3-2/datasets",
+{Authorization: "Basic "+$C360auth, Accept: "application/json"}, null) yield value as link1
+        <slide class="row-fluid">
                 <div class="col-sm-12">
                     <h4>Querying the CDISC Library</h4>
                 <p>In the following code, we make two <abbr title="Application Programming Interface">API</abbr> requests to the CDISC Library. First we query for datasets in SDTMIG Version 3.2. The response by CDISC Library is delivered in a .JSON format that Cypher can interpret and use in query number two. We use the response to query the CDISC library for the variables defined in the datasets that the first query returned.</p>
