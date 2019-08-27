@@ -27,7 +27,7 @@
 
         </slide>
         <slide class="row-fluid">
-                <div class="col-sm-9">
+                <div class="col-sm-10">
                         <figure>
                             <pre class="pre-scrollable code runnable">
 CALL apoc.load.jsonParams("https://library.cdisc.org/api/mdr/sdtmig/3-2/datasets",
@@ -45,7 +45,7 @@ WITH dataset_list, link2, dv, d
 CREATE (v:SDTMVariable {name: dv.name, label: dv.label, description: dv.description , role: dv.role , core: dv.core , data_type: dv.simpleDatatype})
 WITH d, v
 CREATE (d)-[:CONTAINS]->(v);</pre>
-                            <figcaption>Find the produce category.</figcaption>
+                            <figcaption>Create the two nodes <strong>SDTMDataset</strong> and <strong>SDTMVariable</strong> by accessing <a href="https://www.cdisc.org/cdisc-library" class="darken">CDISC Library</a>.</figcaption>
                         </figure>
                     </div>
         </slide>
