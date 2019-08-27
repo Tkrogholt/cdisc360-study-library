@@ -40,7 +40,9 @@
                 </figure>
                 <p>The query above doesn't return a cypher node, but instead merely outputs the JSON format that is returned by CDISC Library</p>
                 <p>JSON files can be thought of as a nested tree of attributes. The code above queried the CDISC Library for datasets in SDTM under IG Version 3.2. Below is an excerpt from the response of CDISC Library. We can dissect each piece into useful information.</p>
-                <p>We find that the query returns a bit of metadata, such as the attribute <strong>registrationStatus</strong> containing the value <code>Final</code> as well as the attribute <strong>_links</strong>. <strong>_links</strong> is different from </p>
+                <p>We find that the query returns a bit of metadata, such as the attribute <strong>registrationStatus</strong> containing the value <code>Final</code> as well as the attribute <strong>_links</strong>.</p>
+                <p><strong>_links</strong> is different from <strong>registrationStatus</strong>, because it doesn't contain simply one value, but rather a bunch of nested attributes, which down the line all have a value. These nested attributes are <strong>self</strong> and <strong>priorVersion</strong> - both of which again have nested attributes.</p>
+                <p>We see the final attribute of <strong>_links</strong> is <strong>datasets</strong> that contain an array, corresponding to the SDTM datasets defined within IG 3.2. Here we have shown CO and DM, both of which have the attributes <strong>title</strong>, <strong>type</strong> and <strong>href</strong></p>
                 <code>
                         {
                             "registrationStatus": "Final",
@@ -60,7 +62,13 @@
                                   "title": "Comments",
                                   "type": "SDTM Dataset",
                                   "href": "/mdr/sdtmig/3-2/datasets/CO"
+                                },
+                                {
+                                    "title": "Demographics",
+                                    "type": "SDTM Dataset",
+                                    "href": "/mdr/sdtmig/3-2/datasets/DM"
                                 }
+                                ]
                             }
                         }
                 </code>
