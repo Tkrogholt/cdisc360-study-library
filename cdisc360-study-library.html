@@ -30,6 +30,7 @@
         </slide>
         <slide class="row-fluid">
                 <div class="col-sm-12">
+                <p>In the following code, we make two <abbr title="Application Programming Interface">API</abbr> requests to the CDISC Library. First we query for datasets in SDTMIG Version 3.2. This is delivered in a .JSON format that Cypher can interpret and use in query number two. We use the response to query the CDISC library for the variables defined in the datasets that the first query returned</p>
                         <figure>
                             <pre class="pre-scrollable code runnable">
 CALL apoc.load.jsonParams("https://library.cdisc.org/api/mdr/sdtmig/3-2/datasets",
