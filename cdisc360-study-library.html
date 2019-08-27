@@ -31,7 +31,7 @@
                         <figure>
                             <pre class="pre-scrollable code runnable">
 CALL apoc.load.jsonParams("https://library.cdisc.org/api/mdr/sdtmig/3-2/datasets",
-{Authorization: "Basic "+<b class="text-danger">$C360auth</b>, Accept: "application/json"}, null) yield value as link1
+{Authorization: "Basic "+<span class="text-danger"><b>$C360auth</b></span>, Accept: "application/json"}, null) yield value as link1
 UNWIND link1._links.datasets as dataset_list
 WITH dataset_list 
 // WHERE substring(dataset_list.href, 25) = 'DM'
