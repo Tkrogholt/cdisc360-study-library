@@ -43,6 +43,7 @@
                 <p>We find that the query returns a bit of metadata, such as the attribute <strong>registrationStatus</strong> containing the value <code>Final</code> as well as the attribute <strong>_links</strong>.</p>
                 <p><strong>_links</strong> is different from <strong>registrationStatus</strong>, because it doesn't contain simply one value, but rather a bunch of nested attributes, which down the line all have a value. These nested attributes are <strong>self</strong> and <strong>priorVersion</strong> - both of which again have nested attributes.</p>
                 <p>We see the final attribute of <strong>_links</strong> is <strong>datasets</strong> that contain an array, corresponding to the SDTM datasets defined within IG 3.2. Here we have shown CO and DM, both of which have the attributes <strong>title</strong>, <strong>type</strong> and <strong>href</strong></p>
+                <p>If we extend the query with further Cypher code, we can create nodes based on the JSON response from CDISC library.</p>
                 <code>
                         {
                             "registrationStatus": "Final",
@@ -75,15 +76,11 @@
             </div>
         </slide>
 
-        CALL apoc.load.jsonParams("https://library.cdisc.org/api/mdr/sdtmig/3-2/datasets",
-{Authorization: "Basic "+$C360auth, Accept: "application/json"}, null) yield value as link1
         <slide class="row-fluid">
                 <div class="col-sm-12">
-                    <h4>Querying the CDISC Library</h4>
-                <p>In the following code, we make two <abbr title="Application Programming Interface">API</abbr> requests to the CDISC Library. First we query for datasets in SDTMIG Version 3.2. The response by CDISC Library is delivered in a .JSON format that Cypher can interpret and use in query number two. We use the response to query the CDISC library for the variables defined in the datasets that the first query returned.</p>
-                <p>The first query can be identified by the code: </p>
-                    <code class="center-block">CALL apoc.load.jsonParams(&#34;<strong>https://library.cdisc.org/api/mdr/sdtmig/3-2/datasets</strong>&#34;,{Authorization: &#34;Basic &#34;+$C360auth, Accept: "application/json"}, null)</code>
-                <p>Notice the use of the parameter, <code>&#36;C360auth</code>, which we previously defined.</p>
+                    <h4>Creating our first Cypher nodes</h4>
+                    <p>We will now built further upon the query from last slide and combine it with another API request as well as Cypher node creation by using the Cypher keyword <a href="https://neo4j.com/docs/cypher-manual/current/clauses/create/">CREATE</a></p>
+                    <p>The following statement produces two Cypher nodes: <strong>SDTMDataset</strong> and <strong>SDTMVariable</strong>. We can link these two nodes with a <strong>CONTAINS</strong> relation (X dataset contains Y variable)</p>
                         <figure>
                             <pre class="pre-scrollable code runnable">
 CALL apoc.load.jsonParams("https://library.cdisc.org/api/mdr/sdtmig/3-2/datasets",
@@ -104,6 +101,31 @@ CREATE (d)-[:CONTAINS]->(v);</pre>
                         </figure>
                     </div>
         </slide>
+        <slide class="row-fluid">
+            <div class="col-sm-12">
+                <h4>Creating our first Cypher nodes</h4>
+                <p>We will now built further upon the query from last slide and combine it with another API request as well as Cypher node creation by using the Cypher keyword <a href="https://neo4j.com/docs/cypher-manual/current/clauses/create/">CREATE</a></p>
+                <p>The following statement produces two Cypher nodes: SDTMDataset and SDTMVariable. We can link these two nodes with a CONTAINS relation (X dataset contains Y variable)</p>
+                    <figure>
+                        <pre class="pre-scrollable code runnable">
+CALL apoc.load.jsonParams("https://library.cdisc.org/api/mdr/sdtmig/3-2/datasets",
+{Authorization: "Basic "+<span class="text-danger"><b>$C360auth</b></span>, Accept: "application/json"}, null) yield value as link1
+UNWIND link1._links.datasets as dataset_list
+WITH dataset_list 
+CALL apoc.load.jsonParams("https://library.cdisc.org/api" + dataset_list.href,
+{Authorization: "Basic "+<b class="text-danger">$C360auth</b>, Accept: "application/json"}, null) yield value as link2
+WITH dataset_list, link2
+CREATE (d:SDTMDataset {name: link2.name, label: link2.label, description: link2.description, structure: link2.datasetStructure, ordinal: link2.ordinal})
+WITH dataset_list, link2, d
+UNWIND link2.datasetVariables as dv
+WITH dataset_list, link2, dv, d
+CREATE (v:SDTMVariable {name: dv.name, label: dv.label, description: dv.description , role: dv.role , core: dv.core , data_type: dv.simpleDatatype})
+WITH d, v
+CREATE (d)-[:CONTAINS]->(v);</pre>
+                        <figcaption>Create the two nodes <strong>SDTMDataset</strong> and <strong>SDTMVariable</strong> by accessing <a href="https://www.cdisc.org/cdisc-library" class="darken">CDISC Library</a>.</figcaption>
+                    </figure>
+                </div>
+    </slide>
     </carousel>    
 
 </article>
