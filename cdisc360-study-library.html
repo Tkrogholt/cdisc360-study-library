@@ -103,26 +103,34 @@ CREATE (d)-[:CONTAINS]->(v);</pre>
         </slide>
         <slide class="row-fluid">
             <div class="col-sm-12">
-                <h4>Creating our first Cypher nodes</h4>
-                <p>We will now built further upon the query from last slide and combine it with another API request as well as Cypher node creation by using the Cypher keyword <a href="https://neo4j.com/docs/cypher-manual/current/clauses/create/">CREATE</a></p>
-                <p>The following statement produces two Cypher nodes: SDTMDataset and SDTMVariable. We can link these two nodes with a CONTAINS relation (X dataset contains Y variable)</p>
+                <h4>Attaching information to our nodes</h4>
+                <p>We will now add codelists to the SDTM variables <a href="https://www.cdisc.org/cdisc-library/api-documentation#/SDTM%20Implementation%20Guide%20(SDTMIG)/get_mdr_sdtmig__version__datasets__dataset__variables__var_">(API Documentation)</a></p>
                     <figure>
                         <pre class="pre-scrollable code runnable">
-CALL apoc.load.jsonParams("https://library.cdisc.org/api/mdr/sdtmig/3-2/datasets",
-{Authorization: "Basic "+<span class="text-danger"><b>$C360auth</b></span>, Accept: "application/json"}, null) yield value as link1
-UNWIND link1._links.datasets as dataset_list
-WITH dataset_list 
-CALL apoc.load.jsonParams("https://library.cdisc.org/api" + dataset_list.href,
-{Authorization: "Basic "+<b class="text-danger">$C360auth</b>, Accept: "application/json"}, null) yield value as link2
-WITH dataset_list, link2
-CREATE (d:SDTMDataset {name: link2.name, label: link2.label, description: link2.description, structure: link2.datasetStructure, ordinal: link2.ordinal})
-WITH dataset_list, link2, d
-UNWIND link2.datasetVariables as dv
-WITH dataset_list, link2, dv, d
-CREATE (v:SDTMVariable {name: dv.name, label: dv.label, description: dv.description , role: dv.role , core: dv.core , data_type: dv.simpleDatatype})
+// Add codelist reference to SDTMVariable
+MATCH (d:SDTMDataset)-->(v:SDTMVariable) 
 WITH d, v
-CREATE (d)-[:CONTAINS]->(v);</pre>
-                        <figcaption>Create the two nodes <strong>SDTMDataset</strong> and <strong>SDTMVariable</strong> by accessing <a href="https://www.cdisc.org/cdisc-library" class="darken">CDISC Library</a>.</figcaption>
+call apoc.load.jsonParams("https://library.cdisc.org/api/mdr/sdtmig/3-2/datasets/" + d.name + "/variables/" + v.name,
+{Authorization: "Basic "+<span class="text-danger"><b>$C360auth</b></span>, Accept: "application/json"}, null) yield value as var
+UNWIND var._links.codelist as cl
+SET v.codelist = substring(cl.href, 30)
+WITH v
+MATCH (l:RootCTList)
+WHERE l.concept_id = v.codelist
+MERGE (v)-[:USES]->(l);
+                        </pre>
+                    </figure>
+
+                    <p>We also add the supported SDTM and SDTMIG version as metadata (hardcoding it). We do this by using the Cypher keywords <a href="https://neo4j.com/docs/cypher-manual/current/clauses/merge/">MERGE</a> and <a href="https://neo4j.com/docs/cypher-manual/current/clauses/match/">MATCH</a></p>
+                    <figure>
+                        <pre class="pre-scrollable code runnable">
+// Define the SDTM and SDTMIG Versions we currently support (Hardcoded)
+MERGE (n:SDTMVersion {version: 'SDTM v1.4', api_ref: '1-4', submission_value: '1.4'});
+MERGE (n:SDTMIGVersion {version: 'SDTMIG v3.2', api_ref: '3-2', submission_value: '3.2'});
+
+MATCH (s:SDTMVersion), (i:SDTMIGVersion)
+MERGE (s)-[:HAVE_IG]->(i);
+                        </pre>
                     </figure>
                 </div>
     </slide>
@@ -132,3 +140,4 @@ CREATE (d)-[:CONTAINS]->(v);</pre>
 
 
 </html>
+
